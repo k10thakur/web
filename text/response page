@@ -1,0 +1,14 @@
+Attached Image of a web page which creates url for messages entered by user. User also enters reaveal time and topic of that message. Once Url is created (example: https://toldya.com/12ab), this url is shared with friends. Now create a reveal page for friends when they open this url.
+Reveal page will show Name,Topic,CreationTime and RevealTime. Message is shown if it is not null in response of api (It is null when reveal time is not passed). Make 
+Sample curl: 
+curl --location 'https://nrl7cm3dopjbv3vpixbuupwkc40hmacn.lambda-url.eu-north-1.on.aws/toldya?message_id=12ab'
+sample response: 
+{
+    "name": "k",
+    "subject": "t",
+    "revealTime": 1745827609,
+    "messageCreateTime": 1745833376,
+    "message": "M"
+}
+
+Make space for google ads in website. I want the google ads to be displayed only on Left and Right side of the reveal form when website is opened in desktop/laptop. If the website is opened in mobile device, a small ad should be displayed at the top and bottom of the reveal form.

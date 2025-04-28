@@ -1,0 +1,78 @@
+I am writing a web application in flutter. Below is the details about that web application
+"Create a web application named ToldYa using flutter.  
+A website named "ToldYa" where user can input their message and name and Subject of the message, and select a reveal dateTime of that message. Once user click on "Create ToldYa" button, they will get a url in return. Now user can  share this url with friends or anyone. Whenever their friends will click on that url, they will see a page in Toldya website where they will see the message entered by user if the reveal dateTime has been already crossed. If not, the website will indicate that reveal dateTime is not yet reached and will show them the exact date time when they can come and open this link again to see the message. The friends can see the subject but not the message if reveal dateTime is not yet reached. 
+
+Make the website look a bit friendly and happening.Make background a little bit funky. The website will resize it according to the platform where it is opened (on laptop or mobile devices).
+
+Make space for google ads in website. I want the google ads to be displayed only on Left and Right side of the input form when website is opened in desktop/laptop. If the website is opened in mobile device, a small ad should be displayed at the top and bottom of the input form
+"
+
+Now I want to create serverless apis to support this application. I want to minimise the cost as much as possible (Even use free tier if possible of serverless providers). Suggest me which server provider to use and why (AWS, Azure or google). I want to use the database of the same service provider as well.  Basically I am looking to create 2 api, which will be called from Toldya webite. 
+Api-1 Details: 
+url:  POST {base_url}/toldya/create
+Request body: {
+    "name": "Ketan", // String, Max length 32 char
+    "subject": "something subject", // String, Max length 32 char
+    "message": "The message", // String, Max length 1024 char
+    "revealTime": 1745827609 // Numeric, epoch time in seconds
+}
+
+Successful Response: 
+Response Code: 201
+Response body: {"response_message": "dhfdjhsvbjds" // String, Returns the id of created message } 
+
+Failure Response: 
+Response Code: 500
+Response body: {"response_message": "Something went wrong" // String, returns the failure message } 
+
+
+
+Api-2 Details: 
+url:  GET {base_url}/toldya/{message_id}
+
+Successful Response (if Reveal time is not yet reached):
+Response Code: 200
+Response Body: 
+{
+    "name": "Ketan", // String, Max length 32 char
+    "subject": "something subject", // String, Max length 32 char
+    "revealTime": 1745827609, // Numeric, epoch time in seconds
+    "messageCreateTime": 1745827609, // Numeric, epoch time in seconds
+    "message" : null // will be null in this case
+}
+
+
+Successful Response (if Reveal time is Passed):
+Response Code: 200
+Response Body: 
+{
+    "name": "Ketan", // String, Max length 32 char
+    "subject": "something subject", // String, Max length 32 char
+    "revealTime": 1745827609 // Numeric, epoch time in seconds
+    "message": "The message", // String, Max length 1024 char
+    "messageCreateTime": 1745827609 // Numeric, epoch time in seconds
+}
+
+
+Failure Response (if message_id doesnot exist in database):
+Response Code: 500
+Response Body: 
+{
+    "name": null, // String, will be null in this case
+    "subject": null, // String, will be null in this case
+    "revealTime": null, // Numeric, will be null in this case
+    "response_message": "This message does not exist. Invalid message Id", // String, Max length 1024 char
+    "messageCreateTime": null // Numeric, will be null in this case
+}
+
+
+Failure Response (any other failure):
+Response Code: 500
+Response Body: 
+{
+    "name": null, // String, will be null in this case
+    "subject": null, // String, will be null in this case
+    "revealTime": null, // Numeric, will be null in this case
+    "response_message": "Something went wrong, please try again", // String, Max length 1024 char
+    "messageCreateTime": null // Numeric, will be null in this case
+}

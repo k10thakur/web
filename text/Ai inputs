@@ -1,0 +1,6 @@
+Create a web application named ToldYa using flutter.  
+A website named "ToldYa" where user can input their message and name and Subject of the message, and select a reveal dateTime of that message. Once user click on "Create ToldYa" button, they will get a url in return. Now user can  share this url with friends or anyone. Whenever their friends will click on that url, they will see a page in Toldya website where they will see the message entered by user if the reveal dateTime has been already crossed. If not, the website will indicate that reveal dateTime is not yet reached and will show them the exact date time when they can come and open this link again to see the message. The friends can see the subject but not the message if reveal dateTime is not yet reached. 
+
+Make the website look a bit friendly and happening.Make background a little bit funky. The website will resize it according to the platform where it is opened (on laptop or mobile devices).
+
+Make space for google ads in website. I want the google ads to be displayed only on Left and Right side of the input form when website is opened in desktop/laptop. If the website is opened in mobile device, a small ad should be displayed at the top and bottom of the input form
