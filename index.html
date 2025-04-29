@@ -673,7 +673,7 @@ Ex: Joe & Nia will breakup in a month."
             );
             if (response.status === 201) {
               const data = await response.json();
-              const link = `https://toldya.com/${data.response_message}`;
+              const link = `https://d3sce01hwu3xdy.cloudfront.net/reveal.html?message_id=${data.response_message}`;
               shareLink.value = link;
               shareModal.classList.remove("hidden");
             } else {
