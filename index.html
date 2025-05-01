@@ -1,725 +1,271 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ToldYa! - Make Predictions and Share</title>
-    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: { primary: "#ff7e5f", secondary: "#feb47b" },
-            borderRadius: {
-              none: "0px",
-              sm: "4px",
-              DEFAULT: "8px",
-              md: "12px",
-              lg: "16px",
-              xl: "20px",
-              "2xl": "24px",
-              "3xl": "32px",
-              full: "9999px",
-              button: "8px",
-            },
-          },
-        },
-      };
-    </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
-    />
-    <style>
-      :where([class^="ri-"])::before { content: "\f3c2"; }
-      body {
-      background: linear-gradient(135deg, #feb47b 0%, #ff7e5f 100%);
-      min-height: 100vh;
-      }
-      .doodle {
-      position: absolute;
-      width: 20px;
-      height: 30px;
-      border: 2px solid #000;
-      border-radius: 50%;
-      transform: rotate(45deg);
-      }
-      input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-      filter: invert(0.8);
-      }
-      @media (min-width: 1024px) {
-      .content-container {
-      display: grid;
-      grid-template-columns: 1fr 600px 1fr;
-      }
-      }
-    </style>
-  </head>
-  <body class="font-sans text-gray-900">
-    <!-- Decorative elements -->
-    <div class="doodle absolute top-[10%] left-[10%]"></div>
-    <div class="doodle absolute top-[15%] left-[15%]"></div>
-    <div class="doodle absolute top-[20%] left-[12%]"></div>
-    <div class="doodle absolute top-[25%] left-[8%]"></div>
-    <div class="doodle absolute bottom-[20%] right-[15%]"></div>
-    <div class="doodle absolute bottom-[15%] right-[10%]"></div>
-    <div class="doodle absolute bottom-[25%] right-[12%]"></div>
-    <div class="content-container w-full max-w-screen-xl mx-auto px-4 py-8">
-      <!-- Left ad space (desktop only) -->
-      <div class="hidden lg:block">
-        <div class="bg-white bg-opacity-80 rounded p-4 h-[600px] sticky top-8">
-          <div
-            class="text-center text-gray-400 h-full flex items-center justify-center border border-gray-200 rounded"
-          >
-            <p>Google Ad Space</p>
-          </div>
-        </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TruthHeld – Say What Matters, When It Matters</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    h1, h2, h3 { font-family: 'Pacifico', cursive; }
+    .animate-slide-up {
+      animation: slideUpFade 0.7s ease-out both;
+    }
+    @keyframes slideUpFade {
+      0% { transform: translateY(40px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    .modal-overlay {
+      background: rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-white via-orange-50 to-pink-50 text-gray-800">
+  <!-- Modal for validation messages -->
+  <div id="modal" class="fixed inset-0 hidden z-50 flex items-center justify-center modal-overlay">
+    <div class="bg-white max-w-sm w-full rounded-xl shadow-lg p-6 text-center">
+      <h3 class="text-xl font-semibold text-orange-500 mb-2">Oops! Missing Information</h3>
+      <p class="text-gray-700 mb-4">Please fill in <strong>message</strong>, <strong>subject</strong>, and <strong>reveal time</strong>.</p>
+      <button onclick="closeModal()" class="bg-gradient-to-r from-orange-400 to-pink-400 hover:from-orange-500 hover:to-pink-500 text-white px-4 py-2 rounded-lg font-medium">Got it!</button>
+    </div>
+  </div>
+
+  <!-- Share Modal -->
+  <div id="shareModal" class="fixed inset-0 hidden z-50 flex items-center justify-center modal-overlay">
+    <div class="bg-white/90 backdrop-blur-md max-w-lg w-full rounded-xl shadow-2xl p-6 m-4 transform transition-all">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-xl font-semibold text-orange-500">Share Your Truth</h3>
+        <button id="closeModal" class="text-gray-500 hover:text-gray-700">
+          <i class="ri-close-line text-xl"></i>
+        </button>
       </div>
-      <!-- Main content -->
-      <div class="w-full max-w-md mx-auto">
-        <!-- Mobile top ad -->
-        <div class="lg:hidden mb-6">
-          <div class="bg-white bg-opacity-80 rounded p-2 h-[100px]">
-            <div
-              class="text-center text-gray-400 h-full flex items-center justify-center border border-gray-200 rounded"
-            >
-              <p>Google Ad Space</p>
-            </div>
-          </div>
-        </div>
-        <!-- Logo -->
-        <div class="flex justify-center mb-8">
-          <div class="relative group cursor-pointer">
-            <div
-              class="absolute inset-0 bg-gradient-to-br from-primary via-secondary to-primary blur-xl opacity-60 group-hover:opacity-80 transition-all duration-500 rounded-3xl"
-            ></div>
-            <div
-              class="relative bg-white shadow-2xl rounded-2xl px-8 py-6 flex items-center transform hover:scale-105 transition-all duration-500"
-            >
-              <div
-                class="w-10 h-10 flex items-center justify-center mr-3 bg-gradient-to-br from-primary to-secondary rounded-xl text-white transform group-hover:rotate-12 transition-transform duration-500"
-              >
-                <i class="ri-magic-line ri-xl"></i>
+      
+      <!-- Preview Card -->
+      <div class="mb-6">
+        <div class="relative w-full aspect-[1.91/1] rounded-xl overflow-hidden shadow-lg mb-4">
+          <img id="predictionImage" src="https://readdy.ai/api/search-image?query=A%20modern%20elegant%20design%20with%20ethereal%20light%20and%20mystical%20symbols%2C%20soft%20orange%20and%20pink%20gradient&width=800&height=418" 
+               alt="Prediction Share Image" class="w-full h-full object-cover" />
+          <div class="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-orange-500/30 p-6">
+            <div class="h-full flex flex-col justify-between">
+              <div class="text-white">
+                <h3 class="font-['Pacifico'] text-4xl mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-orange-300">
+                  TruthHeld
+                </h3>
+                <div class="space-y-2">
+                  <p class="text-xl font-medium" id="predictorName"></p>
+                  <div class="flex items-center gap-2">
+                    <i class="ri-hashtag-line"></i>
+                    <p class="text-lg" id="predictionTopic"></p>
+                  </div>
+                </div>
               </div>
-              <h1
-                class="font-['Pacifico'] text-5xl bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent"
-              >
-                ToldYa!
-              </h1>
-            </div>
-          </div>
-        </div>
-        <!-- Form -->
-        <form class="space-y-4">
-          <div>
-            <input
-              type="text"
-              placeholder="Your name (The predictor)"
-              class="w-full p-4 border-2 border-black rounded bg-white focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
-          <div>
-            <textarea
-              placeholder="Write your prediction...
-Ex: Joe & Nia will breakup in a month."
-              class="w-full p-4 border-2 border-black rounded bg-white h-48 focus:outline-none focus:ring-2 focus:ring-primary"
-            ></textarea>
-          </div>
-          <div>
-            <p class="text-center font-medium mb-2">
-              When do you want to reveal this prediction:
-            </p>
-            <input
-              type="datetime-local"
-              placeholder="DD/MM/YY HH:MM"
-              class="w-full p-4 border-2 border-black rounded bg-white focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
-          <div>
-            <p class="text-sm mb-2">
-              Mention what your prediction is about, for example Cricket,
-              Cinema, Politics, Relationship, Life goals etc
-            </p>
-            <input
-              type="text"
-              placeholder="Topic of prediction"
-              class="w-full p-4 border-2 border-black rounded bg-white focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
-          <div class="pt-4">
-            <button
-              type="button"
-              id="shareButton"
-              class="w-full bg-black text-white p-4 rounded-button flex items-center justify-center space-x-2 hover:bg-gray-800 transition whitespace-nowrap"
-            >
-              <span>Generate a share link</span>
-              <div class="w-5 h-5 flex items-center justify-center">
-                <i class="ri-share-line"></i>
-              </div>
-            </button>
-            <div
-              id="shareModal"
-              class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-            >
-              <div
-                class="bg-white rounded-lg w-full max-w-lg mx-4 overflow-hidden"
-              >
-                <div class="p-6">
-                  <div class="flex justify-between items-center mb-6">
-                    <h3 class="text-xl font-semibold">Share Your Prediction</h3>
-                    <button
-                      type="button"
-                      id="closeModal"
-                      class="text-gray-500 hover:text-gray-700"
-                    >
-                      <div class="w-6 h-6 flex items-center justify-center">
-                        <i class="ri-close-line ri-lg"></i>
-                      </div>
-                    </button>
-                  </div>
-                  <div class="mb-6">
-                    <div class="relative">
-                      <div
-                        class="relative w-full aspect-[1.91/1] rounded-lg shadow-lg overflow-hidden mb-4 cursor-pointer"
-                      >
-                        <img
-                          id="predictionImage"
-                          src="https://readdy.ai/api/search-image?query=A%20modern%20elegant%20design%20with%20ToldYa%20text%20prominently%20displayed%20in%20golden%20letters%2C%20floating%20in%20a%20dreamy%20ethereal%20space%20with%20soft%20glowing%20particles%20and%20mystical%20energy%20swirls.%20The%20background%20features%20a%20gradient%20of%20deep%20purples%20and%20blues%2C%20creating%20a%20magical%20atmosphere%20perfect%20for%20predictions%20and%20future%20telling&width=800&height=418&seq=1&orientation=landscape"
-                          alt="Prediction Share Image"
-                          class="w-full h-full object-cover"
-                        />
-                        <div
-                          class="absolute inset-0 bg-gradient-to-br from-black/60 via-black/40 to-primary/30 p-6"
-                        >
-                          <div class="h-full flex flex-col justify-between">
-                            <div class="text-white">
-                              <h3
-                                class="font-['Pacifico'] text-4xl mb-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-primary/90"
-                              >
-                                ToldYa!
-                              </h3>
-                              <div class="space-y-2">
-                                <p
-                                  class="text-xl font-medium"
-                                  id="predictorName"
-                                ></p>
-                                <div class="flex items-center gap-2">
-                                  <div
-                                    class="w-5 h-5 flex items-center justify-center"
-                                  >
-                                    <i class="ri-hashtag-line"></i>
-                                  </div>
-                                  <p class="text-lg" id="predictionTopic"></p>
-                                </div>
-                              </div>
-                            </div>
-                            <div class="space-y-3">
-                              <div
-                                class="bg-white/10 backdrop-blur-sm rounded-lg p-4"
-                              >
-                                <p class="text-white/80 text-sm mb-1">
-                                  The truth will be revealed on
-                                </p>
-                                <p
-                                  class="text-xl font-medium text-white"
-                                  id="revealDate"
-                                ></p>
-                              </div>
-                              <p class="text-sm text-white/90 italic">
-                                Come back to witness if the prediction comes
-                                true!
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        id="customizeImageBtn"
-                        class="absolute bottom-6 right-2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition"
-                      >
-                        <div class="w-6 h-6 flex items-center justify-center">
-                          <i class="ri-image-edit-line"></i>
-                        </div>
-                      </button>
-                    </div>
-                    <div
-                      id="imageCustomizeModal"
-                      class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-                    >
-                      <div
-                        class="bg-white rounded-lg w-full max-w-3xl mx-4 overflow-hidden"
-                      >
-                        <div class="p-6">
-                          <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-xl font-semibold">
-                              Customize Share Image
-                            </h3>
-                            <button
-                              id="closeImageModal"
-                              class="text-gray-500 hover:text-gray-700"
-                            >
-                              <div
-                                class="w-6 h-6 flex items-center justify-center"
-                              >
-                                <i class="ri-close-line ri-lg"></i>
-                              </div>
-                            </button>
-                          </div>
-                          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="space-y-4">
-                              <div class="border rounded p-4">
-                                <h4 class="font-medium mb-3">Preset Images</h4>
-                                <div class="grid grid-cols-2 gap-2">
-                                  <img
-                                    src="https://readdy.ai/api/search-image?query=A%20modern%20luxurious%20design%20featuring%20ToldYa%20text%20in%20elegant%20typography%2C%20set%20against%20a%20gradient%20background%20transitioning%20from%20coral%20orange%20to%20warm%20peach%2C%20with%20floating%20crystal%20spheres%20and%20delicate%20prediction%20symbols%2C%20soft%20ethereal%20glow%20and%20particle%20effects&width=400&height=209&seq=1&orientation=landscape"
-                                    class="preset-image w-full h-auto rounded cursor-pointer hover:opacity-80 transition"
-                                    alt="Preset 1"
-                                  />
-                                  <img
-                                    src="https://readdy.ai/api/search-image?query=A%20sleek%20minimalist%20composition%20with%20ToldYa%20text%20in%20modern%20sans-serif%2C%20floating%20above%20a%20smooth%20gradient%20from%20sunset%20orange%20to%20warm%20coral%2C%20with%20subtle%20sacred%20geometry%20patterns%20and%20light%20rays%2C%20perfect%20for%20predictions&width=400&height=209&seq=2&orientation=landscape"
-                                    class="preset-image w-full h-auto rounded cursor-pointer hover:opacity-80 transition"
-                                    alt="Preset 2"
-                                  />
-                                  <img
-                                    src="https://readdy.ai/api/search-image?query=An%20artistic%20design%20with%20ToldYa%20text%20in%20flowing%20script%2C%20set%20on%20a%20dynamic%20background%20blending%20warm%20oranges%20and%20soft%20corals%2C%20with%20mystical%20crystal%20balls%20and%20prediction%20symbols%20creating%20an%20enchanting%20atmosphere&width=400&height=209&seq=3&orientation=landscape"
-                                    class="preset-image w-full h-auto rounded cursor-pointer hover:opacity-80 transition"
-                                    alt="Preset 3"
-                                  />
-                                  <img
-                                    src="https://readdy.ai/api/search-image?query=A%20contemporary%20design%20showcasing%20ToldYa%20text%20with%20a%20premium%20feel%2C%20featuring%20a%20gradient%20from%20coral%20to%20peach%2C%20decorated%20with%20floating%20time%20symbols%20and%20prediction%20elements%2C%20soft%20light%20effects%20and%20minimal%20geometric%20patterns&width=400&height=209&seq=4&orientation=landscape"
-                                    class="preset-image w-full h-auto rounded cursor-pointer hover:opacity-80 transition"
-                                    alt="Preset 4"
-                                  />
-                                </div>
-                              </div>
-                              <div class="border rounded p-4">
-                                <h4 class="font-medium mb-3">
-                                  Upload Custom Image
-                                </h4>
-                                <input
-                                  type="file"
-                                  id="imageUpload"
-                                  accept="image/*"
-                                  class="hidden"
-                                />
-                                <button
-                                  type="button"
-                                  id="uploadImageBtn"
-                                  class="w-full py-2 px-4 border-2 border-dashed border-gray-300 rounded flex items-center justify-center gap-2 hover:border-primary transition"
-                                >
-                                  <i class="ri-upload-2-line"></i>
-                                  <span>Choose Image</span>
-                                </button>
-                              </div>
-                            </div>
-                            <div class="space-y-4">
-                              <div class="border rounded p-4">
-                                <h4 class="font-medium mb-3">Preview</h4>
-                                <img
-                                  id="previewImage"
-                                  class="w-full h-auto rounded shadow-lg"
-                                  src=""
-                                  alt="Preview"
-                                />
-                              </div>
-                              <div class="border rounded p-4">
-                                <h4 class="font-medium mb-3">Image Filters</h4>
-                                <div class="grid grid-cols-3 gap-2">
-                                  <button
-                                    type="button"
-                                    class="filter-btn p-2 rounded border hover:border-primary transition"
-                                    data-filter="none"
-                                  >
-                                    None
-                                  </button>
-                                  <button
-                                    type="button"
-                                    class="filter-btn p-2 rounded border hover:border-primary transition"
-                                    data-filter="grayscale"
-                                  >
-                                    Grayscale
-                                  </button>
-                                  <button
-                                    type="button"
-                                    class="filter-btn p-2 rounded border hover:border-primary transition"
-                                    data-filter="sepia"
-                                  >
-                                    Sepia
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                          <div class="mt-6 flex justify-end gap-3">
-                            <button
-                              type="button"
-                              id="cancelImageCustomization"
-                              class="px-4 py-2 border rounded-button hover:bg-gray-50 transition"
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              type="button"
-                              id="saveImageCustomization"
-                              class="px-4 py-2 bg-primary text-white rounded-button hover:bg-opacity-90 transition"
-                            >
-                              Save Changes
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="mb-6">
-                    <label class="block text-sm font-medium text-gray-700 mb-2"
-                      >Share Link</label
-                    >
-                    <div class="flex gap-2">
-                      <input
-                        id="shareLink"
-                        type="text"
-                        readonly
-                        class="flex-1 p-3 border border-gray-300 rounded bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary"
-                        value=""
-                      />
-                      <button
-                        type="button"
-                        id="copyButton"
-                        class="bg-primary text-white px-4 rounded-button whitespace-nowrap hover:bg-opacity-90 transition"
-                      >
-                        <div
-                          class="w-full h-full flex items-center justify-center gap-2"
-                        >
-                          <i class="ri-file-copy-line"></i>
-                          <span>Copy</span>
-                        </div>
-                      </button>
-                    </div>
-                  </div>
-                  <div>
-                    <p class="text-sm font-medium text-gray-700 mb-3">
-                      Share on Social Media
-                    </p>
-                    <div class="grid grid-cols-2 gap-3 mb-3">
-                      <button
-                        type="button"
-                        class="bg-[#1DA1F2] text-white p-3 rounded-button hover:bg-opacity-90 transition"
-                      >
-                        <div
-                          class="w-full h-full flex items-center justify-center gap-2"
-                        >
-                          <i class="ri-twitter-x-fill"></i>
-                          <span>Twitter</span>
-                        </div>
-                      </button>
-                      <button
-                        type="button"
-                        class="bg-[#4267B2] text-white p-3 rounded-button hover:bg-opacity-90 transition"
-                      >
-                        <div
-                          class="w-full h-full flex items-center justify-center gap-2"
-                        >
-                          <i class="ri-facebook-fill"></i>
-                          <span>Facebook</span>
-                        </div>
-                      </button>
-                      <button
-                        type="button"
-                        class="bg-[#E4405F] text-white p-3 rounded-button hover:bg-opacity-90 transition"
-                      >
-                        <div
-                          class="w-full h-full flex items-center justify-center gap-2"
-                        >
-                          <i class="ri-instagram-fill"></i>
-                          <span>Instagram</span>
-                        </div>
-                      </button>
-                      <button
-                        type="button"
-                        class="bg-[#25D366] text-white p-3 rounded-button hover:bg-opacity-90 transition"
-                      >
-                        <div
-                          class="w-full h-full flex items-center justify-center gap-2"
-                        >
-                          <i class="ri-whatsapp-fill"></i>
-                          <span>WhatsApp</span>
-                        </div>
-                      </button>
-                      <button
-                        type="button"
-                        class="bg-[#495057] text-white p-3 rounded-button hover:bg-opacity-90 transition"
-                      >
-                        <div
-                          class="w-full h-full flex items-center justify-center gap-2"
-                        >
-                          <i class="ri-earth-fill"></i>
-                          <span>Truth Social</span>
-                        </div>
-                      </button>
-                      <button
-                        type="button"
-                        class="bg-[#0088cc] text-white p-3 rounded-button hover:bg-opacity-90 transition"
-                      >
-                        <div
-                          class="w-full h-full flex items-center justify-center gap-2"
-                        >
-                          <i class="ri-telegram-fill"></i>
-                          <span>Telegram</span>
-                        </div>
-                      </button>
-                    </div>
-                  </div>
+              <div class="space-y-3">
+                <div class="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                  <p class="text-white/80 text-sm mb-1">Truth will be revealed on</p>
+                  <p class="text-xl font-medium text-white" id="revealDate"></p>
                 </div>
               </div>
             </div>
           </div>
-        </form>
-        <!-- Mobile bottom ad -->
-        <div class="lg:hidden mt-6">
-          <div class="bg-white bg-opacity-80 rounded p-2 h-[100px]">
-            <div
-              class="text-center text-gray-400 h-full flex items-center justify-center border border-gray-200 rounded"
-            >
-              <p>Google Ad Space</p>
-            </div>
-          </div>
         </div>
       </div>
-      <!-- Right ad space (desktop only) -->
-      <div class="hidden lg:block">
-        <div class="bg-white bg-opacity-80 rounded p-4 h-[600px] sticky top-8">
-          <div
-            class="text-center text-gray-400 h-full flex items-center justify-center border border-gray-200 rounded"
-          >
-            <p>Google Ad Space</p>
+
+      <!-- Share Link -->
+      <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Share Link</label>
+        <div class="flex gap-2">
+          <input id="shareLink" type="text" readonly
+            class="flex-1 p-3 border border-orange-200 rounded-lg bg-white/50 backdrop-blur-sm focus:ring-2 focus:ring-orange-300" />
+          <button id="copyButton"
+            class="bg-gradient-to-r from-orange-400 to-pink-400 text-white px-4 rounded-lg hover:opacity-90 transition flex items-center gap-2">
+            <i class="ri-file-copy-line"></i>
+            <span>Copy</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Social Share -->
+      <div>
+        <p class="text-sm font-medium text-gray-700 mb-3">Share on Social Media</p>
+        <div class="grid grid-cols-2 gap-3">
+          <button class="bg-[#1DA1F2] text-white p-3 rounded-lg hover:opacity-90 transition flex items-center justify-center gap-2">
+            <i class="ri-twitter-x-fill"></i>
+            <span>Twitter</span>
+          </button>
+          <button class="bg-[#4267B2] text-white p-3 rounded-lg hover:opacity-90 transition flex items-center justify-center gap-2">
+            <i class="ri-facebook-fill"></i>
+            <span>Facebook</span>
+          </button>
+          <button class="bg-[#25D366] text-white p-3 rounded-lg hover:opacity-90 transition flex items-center justify-center gap-2">
+            <i class="ri-whatsapp-fill"></i>
+            <span>WhatsApp</span>
+          </button>
+          <button class="bg-[#0088cc] text-white p-3 rounded-lg hover:opacity-90 transition flex items-center justify-center gap-2">
+            <i class="ri-telegram-fill"></i>
+            <span>Telegram</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Animated Hero Section -->
+  <section id="intro" class="fixed inset-0 z-40 flex flex-col justify-center items-center text-center bg-gradient-to-b from-white to-orange-50 transition-opacity duration-1000 p-4">
+    <h1 class="text-4xl sm:text-5xl md:text-6xl mb-4 text-transparent bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text animate-fade-in">TruthHeld</h1>
+    <p class="text-lg sm:text-xl md:text-2xl max-w-xl animate-fade-in delay-200">Some truths aren’t for today. Write them now, reveal them when the time is right.</p>
+  </section>
+
+  <!-- Input Form Section -->
+  <section id="formSection" class="py-12 px-4 hidden">
+    <div class="max-w-2xl mx-auto animate-slide-up">
+      <div class="flex justify-center mb-6">
+        <h1 class="text-3xl sm:text-4xl md:text-5xl text-transparent bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text">TruthHeld</h1>
+      </div>
+      <div class="bg-white shadow-2xl rounded-3xl p-6 sm:p-8 border border-orange-100 transition-transform hover:scale-[1.01]">
+        <h2 class="text-2xl sm:text-3xl text-center mb-6 text-orange-500">Create a Timed Truth</h2>
+        <form id="truthForm" class="space-y-4">
+          <input type="text" id="name" placeholder="Your name (optional)" class="w-full p-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-300" />
+          <textarea id="message" placeholder="Write your message..." class="w-full p-3 border border-gray-300 rounded-2xl h-40 focus:ring-2 focus:ring-orange-300"></textarea>
+          <input type="datetime-local" id="revealTime" class="w-full p-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-300" />
+          <input type="text" id="subject" placeholder="Subject (e.g., Life, Love, Career)" class="w-full p-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-300" />
+          <button type="submit" class="w-full bg-gradient-to-r from-orange-400 to-pink-400 hover:from-orange-500 hover:to-pink-500 text-white py-3 rounded-2xl font-semibold transition">Generate Share Link</button>
+        </form>
+        <div id="result" class="mt-6 hidden">
+          <p class="mb-2 font-semibold">Your link:</p>
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <input id="shareLink" readonly class="flex-1 p-2 border rounded-2xl bg-gray-50" />
+            <button onclick="copyLink()" class="bg-gray-800 text-white px-4 py-2 rounded-2xl">Copy</button>
           </div>
         </div>
       </div>
     </div>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const imageCustomizeModal = document.getElementById("imageCustomizeModal");
-        const customizeImageBtn = document.getElementById("customizeImageBtn");
-        const closeImageModal = document.getElementById("closeImageModal");
-        const uploadImageBtn = document.getElementById("uploadImageBtn");
-        const imageUpload = document.getElementById("imageUpload");
-        const previewImage = document.getElementById("previewImage");
-        const predictionImage = document.getElementById("predictionImage");
-        const filterBtns = document.querySelectorAll(".filter-btn");
-        const saveImageCustomization = document.getElementById(
-          "saveImageCustomization",
-        );
-        const cancelImageCustomization = document.getElementById(
-          "cancelImageCustomization",
-        );
-        const presetImages = document.querySelectorAll(".preset-image");
-        let currentFilter = "none";
-        let selectedImage = predictionImage.src;
-        previewImage.src = selectedImage;
-        customizeImageBtn.addEventListener("click", () => {
-          imageCustomizeModal.classList.remove("hidden");
-          previewImage.src = selectedImage;
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-100 text-gray-600 text-center p-6 mt-12 text-sm sm:text-base">
+    <p>&copy; 2025 TruthHeld. All rights reserved.</p>
+  </footer>
+
+  <style>
+    .animate-fade-in {
+      animation: fadeIn 1.2s ease-in-out forwards;
+      opacity: 0;
+    }
+    .delay-200 {
+      animation-delay: 0.2s;
+    }
+    @keyframes fadeIn {
+      to { opacity: 1; transform: none; }
+    }
+  </style>
+
+  <script>
+    // Hero to form transition
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        const intro = document.getElementById('intro');
+        intro.classList.add('opacity-0');
+        setTimeout(() => {
+          intro.style.display = 'none';
+          document.getElementById('formSection').classList.remove('hidden');
+        }, 1000);
+      }, 2000);
+    });
+
+    document.getElementById('truthForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const message = document.getElementById('message').value;
+      const subject = document.getElementById('subject').value;
+      const revealTimeRaw = document.getElementById('revealTime').value;
+
+      if (!message || !subject || !revealTimeRaw) {
+        showModal();
+        return;
+      }
+
+      const revealTime = Math.floor(new Date(revealTimeRaw).getTime() / 1000);
+
+      try {
+        const response = await fetch('https://wb6v5vi4xxl7ckubeauxzabw2q0mfsfz.lambda-url.eu-north-1.on.aws/toldya/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, message, subject, revealTime })
         });
-        closeImageModal.addEventListener("click", () => {
-          imageCustomizeModal.classList.add("hidden");
+
+        const data = await response.json();
+        const link = `https://d3sce01hwu3xdy.cloudfront.net/reveal.html?message_id=${data.response_message}`;
+        
+        // Update share modal content
+        document.getElementById('shareLink').value = link;
+        document.getElementById('predictorName').textContent = name || 'Anonymous';
+        document.getElementById('predictionTopic').textContent = `#${subject}`;
+        document.getElementById('revealDate').textContent = new Date(revealTime * 1000).toLocaleString('en-US', {
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric',
+          hour: 'numeric',
+          minute: 'numeric',
+          hour12: true
         });
-        cancelImageCustomization.addEventListener("click", () => {
-          imageCustomizeModal.classList.add("hidden");
-        });
-        uploadImageBtn.addEventListener("click", () => {
-          imageUpload.click();
-        });
-        imageUpload.addEventListener("change", (e) => {
-          const file = e.target.files[0];
-          if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              selectedImage = e.target.result;
-              previewImage.src = selectedImage;
-            };
-            reader.readAsDataURL(file);
-          }
-        });
-        presetImages.forEach((img) => {
-          img.addEventListener("click", () => {
-            selectedImage = img.src;
-            previewImage.src = selectedImage;
-          });
-        });
-        filterBtns.forEach((btn) => {
-          btn.addEventListener("click", () => {
-            currentFilter = btn.dataset.filter;
-            filterBtns.forEach((b) => b.classList.remove("border-primary"));
-            btn.classList.add("border-primary");
-            applyFilter();
-          });
-        });
-        function updatePredictionDetails() {
-          const name =
-            document.querySelector('input[type="text"]').value || "Anonymous";
-          const date = document.querySelector('input[type="datetime-local"]').value;
-          const topic =
-            document.querySelectorAll('input[type="text"]')[1].value || "General";
-          document.getElementById("predictorName").textContent = name;
-          document.getElementById("predictionTopic").textContent = `#${topic}`;
-          document.getElementById("revealDate").textContent = formatDate(date);
-        }
-        function applyFilter() {
-          let filterStyle = "";
-          switch (currentFilter) {
-            case "grayscale":
-              filterStyle = "grayscale(100%)";
-              break;
-            case "sepia":
-              filterStyle = "sepia(100%)";
-              break;
-            default:
-              filterStyle = "none";
-          }
-          previewImage.style.filter = filterStyle;
-          updatePredictionDetails();
-        }
-        document
-          .querySelector('input[type="text"]')
-          .addEventListener("input", updatePredictionDetails);
-        document
-          .querySelector('input[type="datetime-local"]')
-          .addEventListener("input", updatePredictionDetails);
-        document
-          .querySelectorAll('input[type="text"]')[1]
-          .addEventListener("input", updatePredictionDetails);
-        document.addEventListener("DOMContentLoaded", updatePredictionDetails);
-        saveImageCustomization.addEventListener("click", () => {
-          predictionImage.src = selectedImage;
-          predictionImage.style.filter = previewImage.style.filter;
-          imageCustomizeModal.classList.add("hidden");
-        });
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        tomorrow.setHours(12, 0, 0, 0);
-        const dateTimeInput = document.querySelector('input[type="datetime-local"]');
-        if (dateTimeInput) {
-          const formattedDate = tomorrow.toISOString().slice(0, 16);
-          dateTimeInput.value = formattedDate;
-        }
-        const shareButton = document.getElementById("shareButton");
-        const shareModal = document.getElementById("shareModal");
-        const closeModal = document.getElementById("closeModal");
-        const copyButton = document.getElementById("copyButton");
-        const shareLink = document.getElementById("shareLink");
-        function generateUniqueId() {
-          return Date.now().toString(36) + Math.random().toString(36).substring(2);
-        }
-        function formatDate(dateString) {
-          const date = new Date(dateString);
-          return date.toLocaleString("en-US", {
-            month: "long",
-            day: "numeric",
-            year: "numeric",
-            hour: "numeric",
-            minute: "numeric",
-            hour12: true,
-          });
-        }
-        shareButton.addEventListener("click", async function () {
-          const name = document.querySelector('input[type="text"]').value;
-          const prediction = document.querySelector("textarea").value;
-          const date = document.querySelector('input[type="datetime-local"]').value;
-          const topic = document.querySelectorAll('input[type="text"]')[1].value;
-          if (!name || !prediction || !date || !topic) {
-            const missingFields = [];
-            if (!name) missingFields.push("name");
-            if (!prediction) missingFields.push("prediction");
-            if (!date) missingFields.push("date");
-            if (!topic) missingFields.push("topic");
-            const modalContent = `
-      <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-lg p-6 max-w-sm mx-4">
-      <h3 class="text-lg font-semibold mb-4">Missing Information</h3>
-      <p class="mb-4">Please fill in all required fields: ${missingFields.join(", ")}</p>
-      <button class="bg-primary text-white px-4 py-2 rounded-button" onclick="this.parentElement.parentElement.remove()">OK</button>
-      </div>
-      </div>
-      `;
-            document.body.insertAdjacentHTML("beforeend", modalContent);
-            return;
-          }
-          try {
-            shareButton.disabled = true;
-            shareButton.innerHTML =
-              '<div class="w-full h-full flex items-center justify-center gap-2"><i class="ri-loader-4-line animate-spin"></i><span>Generating...</span></div>';
-            const revealTime = Math.floor(new Date(date).getTime() / 1000);
-            const response = await fetch(
-              "https://wb6v5vi4xxl7ckubeauxzabw2q0mfsfz.lambda-url.eu-north-1.on.aws/toldya/create",
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  name: name,
-                  subject: topic,
-                  message: prediction,
-                  revealTime: revealTime,
-                }),
-              },
-            );
-            if (response.status === 201) {
-              const data = await response.json();
-              const link = `https://d3sce01hwu3xdy.cloudfront.net/reveal.html?message_id=${data.response_message}`;
-              shareLink.value = link;
-              shareModal.classList.remove("hidden");
-            } else {
-              throw new Error("Failed to generate share link");
-            }
-          } catch (error) {
-            const errorModal = `
-      <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-lg p-6 max-w-sm mx-4">
-      <h3 class="text-lg font-semibold mb-4">Error</h3>
-      <p class="mb-4">Failed to generate share link. Please try again.</p>
-      <button class="bg-primary text-white px-4 py-2 rounded-button" onclick="this.parentElement.parentElement.remove()">OK</button>
-      </div>
-      </div>
-      `;
-            document.body.insertAdjacentHTML("beforeend", errorModal);
-          } finally {
-            shareButton.disabled = false;
-            shareButton.innerHTML =
-              '<div class="w-full h-full flex items-center justify-center gap-2"><span>Generate a share link</span><div class="w-5 h-5 flex items-center justify-center"><i class="ri-share-line"></i></div></div>';
-          }
-        });
-        closeModal.addEventListener("click", function () {
-          shareModal.classList.add("hidden");
-        });
-        shareModal.addEventListener("click", function (e) {
-          if (e.target === shareModal) {
-            shareModal.classList.add("hidden");
-          }
-        });
-        copyButton.addEventListener("click", function () {
-          shareLink.select();
-          document.execCommand("copy");
-          const originalText = copyButton.innerHTML;
-          copyButton.innerHTML =
-            '<div class="w-full h-full flex items-center justify-center gap-2"><i class="ri-check-line"></i><span>Copied!</span></div>';
-          setTimeout(() => {
-            copyButton.innerHTML = originalText;
-          }, 2000);
-        });
-        document.addEventListener("keydown", function (e) {
-          if (e.key === "Escape") {
-            shareModal.classList.add("hidden");
-          }
-        });
-      });
-    </script>
-  </body>
+        
+        // Show share modal
+        document.getElementById('shareModal').classList.remove('hidden');
+      } catch (error) {
+        alert('Something went wrong. Please try again.');
+      }
+    });
+
+    // Modal controls
+    document.getElementById('closeModal').addEventListener('click', function() {
+      document.getElementById('shareModal').classList.add('hidden');
+    });
+
+    // Copy button functionality
+    document.getElementById('copyButton').addEventListener('click', function() {
+      const shareLink = document.getElementById('shareLink');
+      shareLink.select();
+      document.execCommand('copy');
+      
+      const copyButton = this;
+      const originalContent = copyButton.innerHTML;
+      copyButton.innerHTML = '<i class="ri-check-line"></i><span>Copied!</span>';
+      
+      setTimeout(() => {
+        copyButton.innerHTML = originalContent;
+      }, 2000);
+    });
+
+    // Close modal on outside click
+    document.getElementById('shareModal').addEventListener('click', function(e) {
+      if (e.target === this) {
+        this.classList.add('hidden');
+      }
+    });
+
+    // Close modal on escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        document.getElementById('shareModal').classList.add('hidden');
+      }
+    });
+
+    function showModal() {
+      document.getElementById('modal').classList.remove('hidden');
+    }
+    function closeModal() {
+      document.getElementById('modal').classList.add('hidden');
+    }
+
+    function copyLink() {
+      const linkInput = document.getElementById('shareLink');
+      linkInput.select();
+      document.execCommand('copy');
+      alert('Link copied to clipboard!');
+    }
+  </script>
+</body>
 </html>
