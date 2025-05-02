@@ -8,6 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_orange.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <style>
     body { font-family: 'Inter', sans-serif; }
     h1, h2, h3 { font-family: 'Pacifico', cursive; }
@@ -20,6 +23,18 @@
     }
     .modal-overlay {
       background: rgba(0, 0, 0, 0.5);
+    }
+    /* Custom datetime styling */
+    .flatpickr-input[readonly] {
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.2px;
+      color: #1a1a1a;
+    }
+    .flatpickr-calendar {
+      font-family: 'Inter', sans-serif;
+    }
+    .flatpickr-current-month {
+      font-family: 'Pacifico', cursive;
     }
   </style>
 </head>
@@ -129,7 +144,16 @@
         <form id="truthForm" class="space-y-4">
           <input type="text" id="name" placeholder="Your name (optional)" class="w-full p-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-300" />
           <textarea id="message" placeholder="Write your message..." class="w-full p-3 border border-gray-300 rounded-2xl h-40 focus:ring-2 focus:ring-orange-300"></textarea>
-          <input type="datetime-local" id="revealTime" class="w-full p-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-300" />
+          <div class="relative">
+            <input type="text" id="revealTime" class="w-full p-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-300 bg-orange-50/50 text-gray-800 font-medium" placeholder="Select date and time" />
+            <div class="text-sm text-gray-500 mt-1.5 ml-1 flex items-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 7v5l3 3"></path>
+              </svg>
+              <span id="timezone" class="font-medium text-orange-500"></span>
+            </div>
+          </div>
           <input type="text" id="subject" placeholder="Subject (e.g., Life, Love, Career)" class="w-full p-3 border border-gray-300 rounded-2xl focus:ring-2 focus:ring-orange-300" />
           <button type="submit" class="w-full bg-gradient-to-r from-orange-400 to-pink-400 hover:from-orange-500 hover:to-pink-500 text-white py-3 rounded-2xl font-semibold transition">Generate Share Link</button>
         </form>
@@ -165,6 +189,29 @@
   <script>
     // Hero to form transition
     window.addEventListener('DOMContentLoaded', () => {
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      document.getElementById('timezone').textContent = timezone;
+      
+      flatpickr('#revealTime', {
+        enableTime: true,
+        dateFormat: 'Y-m-d H:i',
+        time_24hr: false,
+        minDate: 'today',
+        defaultDate: new Date(),
+        theme: 'material_orange',
+        altInput: true,
+        altFormat: "d M Y, h:i K",
+        formatDate: (date, format) => {
+          if (format === "Y-m-d H:i") {
+            const timeZoneAbbr = new Intl.DateTimeFormat('en', { timeZoneName: 'short' })
+              .formatToParts(date)
+              .find(part => part.type === 'timeZoneName')?.value || '';
+            return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')} ${timeZoneAbbr}`;
+          }
+          return flatpickr.formatDate(date, format);
+        }
+      });
+
       setTimeout(() => {
         const intro = document.getElementById('intro');
         intro.classList.add('opacity-0');
